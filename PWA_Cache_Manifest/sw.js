@@ -1,9 +1,9 @@
 const cacheName = 'cache-offline-v1';
 const filesOffline = [
-    "/",
-    "/index.html",
-    "/manifest.json",
-    "/pages/error.html"
+    "../",
+    "../index.html",
+    "../manifest.json",
+    "../pages/error.html"
 ]
 
 self.addEventListener('install', (event) =>{
