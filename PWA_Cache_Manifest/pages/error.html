@@ -1,0 +1,179 @@
+<!doctype html>
+<html lang="es">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Sin conexión — Error</title>
+    <style>
+        :root {
+            --bg: #0f172a;
+            --card: #0b1220;
+            --accent: #60a5fa;
+            --muted: #94a3b8;
+            --glass: rgba(255, 255, 255, 0.04);
+            --radius: 18px;
+            --shadow: 0 8px 30px rgba(2, 6, 23, 0.6);
+        }
+
+        * {
+            box-sizing: border-box
+        }
+
+        html,
+        body {
+            height: 100%
+        }
+
+        body {
+            margin: 0;
+            font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+            background: radial-gradient(1200px 600px at 10% 10%, rgba(96, 165, 250, 0.07), transparent),
+                radial-gradient(1000px 500px at 90% 90%, rgba(139, 92, 246, 0.04), transparent),
+                var(--bg);
+            color: #e6eef8;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+        }
+
+        .card {
+            width: 100%;
+            max-width: 920px;
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.02), rgba(255, 255, 255, 0.01));
+            border-radius: var(--radius);
+            padding: 36px;
+            box-shadow: var(--shadow);
+            display: flex;
+            gap: 28px;
+            align-items: center;
+        }
+
+        .illustration {
+            flex: 0 0 220px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .illustration svg {
+            width: 160px;
+            height: 160px;
+            display: block
+        }
+
+        .content {
+            flex: 1
+        }
+
+        h1 {
+            margin: 0 0 8px 0;
+            font-size: 28px;
+            letter-spacing: -0.5px;
+        }
+
+        p {
+            color: var(--muted);
+            margin: 0 0 18px 0;
+            font-size: 15px
+        }
+
+        .hint {
+            font-size: 13px;
+            color: #9fb2d6;
+            margin-bottom: 18px
+        }
+
+        .actions {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap
+        }
+
+        .btn {
+            display: inline-block;
+            text-decoration: none;
+            padding: 12px 18px;
+            border-radius: 12px;
+            background: linear-gradient(180deg, var(--accent), #3b82f6);
+            box-shadow: 0 6px 18px rgba(59, 130, 246, 0.18);
+            color: white;
+            font-weight: 600;
+            transition: transform .15s ease, box-shadow .15s ease;
+            border: none;
+            cursor: pointer;
+        }
+
+        .btn:active {
+            transform: translateY(1px)
+        }
+
+        .btn.outline {
+            background: transparent;
+            color: var(--accent);
+            border: 1px solid rgba(96, 165, 250, 0.16);
+            box-shadow: none;
+            font-weight: 600;
+        }
+
+        .small {
+            font-size: 13px;
+            padding: 8px 12px;
+            border-radius: 10px
+        }
+
+        @media (max-width:700px) {
+            .card {
+                flex-direction: column;
+                align-items: center;
+                text-align: center;
+                padding: 28px
+            }
+
+            .illustration {
+                flex: 0 0 auto
+            }
+
+            h1 {
+                font-size: 24px
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <main class="card" role="main" aria-labelledby="title">
+        <div class="illustration" aria-hidden="true">
+            <!-- simple offline SVG icon -->
+            <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                <defs>
+                    <linearGradient id="g" x1="0" x2="1">
+                        <stop offset="0" stop-color="#60A5FA" />
+                        <stop offset="1" stop-color="#3B82F6" />
+                    </linearGradient>
+                </defs>
+                <rect x="2" y="14" width="60" height="36" rx="6" fill="url(#g)" fill-opacity="0.12" />
+                <path d="M8 26c4-6 12-10 24-10s20 4 24 10" stroke="#60A5FA" stroke-width="2.5" stroke-linecap="round"
+                    stroke-linejoin="round" />
+                <circle cx="32" cy="34" r="10" fill="#0b1220" stroke="#60A5FA" stroke-width="2.5" />
+                <path d="M26 28l12 12M38 28L26 40" stroke="#60A5FA" stroke-width="2.5" stroke-linecap="round"
+                    stroke-linejoin="round" />
+            </svg>
+        </div>
+
+        <div class="content">
+            <h1 id="title">No hay conexión</h1>
+            <p>Tu dispositivo parece estar <strong>offline</strong>. Algunas funciones de la página pueden no estar
+                disponibles hasta que recuperes la conexión.</p>
+            <div class="hint">Consejos: revisa tu Wi‑Fi o datos móviles, o intenta reconectar el router.</div>
+
+            <div class="actions">
+                <a class="btn" href="../index.html" id="homeBtn">Volver al inicio</a>
+            </div>
+        </div>
+    </main>
+
+</body>
+
+</html>
