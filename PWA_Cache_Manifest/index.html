@@ -3,11 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Manifest</title>
+    <title>Manifest con Cache</title>
     <link rel="manifest" href="manifest.json">
 </head>
 <body>
-    <h1>Manifest en Cache</h1>
+     <header>
+        <h1>🍹 Buscador de Cócteles PWA</h1>
+    </header>
+    <main>
+        <section class="search-box">
+            <input type="text" id="cocktailName" placeholder="Escribe el nombre del cóctel (ej. Margarita)" value="Mojito">
+            <button id="searchButton">Buscar</button>
+        </section>
+        <section id="result" class="result-container">
+            <p>Escribe un nombre de cóctel y presiona buscar para iniciar la prueba.</p>
+        </section>
+    </main>
     <!-- Solo permite imagenes png o svg -->
     <script>
         if('serviceWorker' in navigator){
@@ -24,5 +35,6 @@
             console.log("Error al levantar el sw")
         }  
     </script>
+    <script src="/scripts/app.js"></script>
 </body>
 </html>
