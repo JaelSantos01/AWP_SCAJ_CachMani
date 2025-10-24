@@ -1,84 +1,92 @@
+// =============================
+// 🧠 CONFIGURACIÓN DEL SW
+// =============================
 const cacheName = 'cache-offline-v1';
 const filesOffline = [
-    "../",
-    "../index.html",
-    "../manifest.json",
-    "../pages/error.html",
-    "../scripts/app.js"
-]
+  './',
+  './index.html',
+  './manifest.json',
+  './pages/error.html',
+  './scripts/app.js'
+];
 
-// ======================================================
-// A. CONFIGURACIÓN INICIAL
-// ======================================================
-
-// 2. JSON de Fallback para la API (usado cuando la red falla)
+// JSON de fallback cuando no hay conexión a la API
 const OFFLINE_COCKTAIL_JSON = {
-    drinks: [{
-        idDrink: "00000",
-        strDrink: "🚫 ¡Sin Conexión ni Datos Frescos!",
-        strTags: "FALLBACK",
-        strCategory: "Desconectado",
-        strInstructions: "No pudimos obtener resultados en este momento. Este es un resultado GENÉRICO para demostrar que la aplicación NO SE ROMPE.Intenta conectarte de nuevo.",
-        strDrinkThumb: "https://via.placeholder.com/200x300?text=OFFLINE",
-        strIngredient1: "Servicio Worker",
-        strIngredient2: "Fallback JSON"
-    }]
+  drinks: [{
+    idDrink: "00000",
+    strDrink: "🚫 ¡Sin Conexión ni Datos Frescos!",
+    strTags: "FALLBACK",
+    strCategory: "Desconectado",
+    strInstructions: "No pudimos obtener resultados. Este es un resultado genérico. Intenta reconectarte.",
+    strDrinkThumb: "https://via.placeholder.com/200x300?text=OFFLINE",
+    strIngredient1: "Service Worker",
+    strIngredient2: "Fallback JSON"
+  }]
 };
 
-// ======================================================
-// B. CICLO DE VIDA: INSTALACIÓN (PRECACHE)
-// ======================================================
+// =============================
+// ⚙️ INSTALACIÓN (PRECACHE)
+// =============================
 self.addEventListener('install', event => {
-    console.log('[SW] ⚙️ Instalando y precacheando el App Shell...');
-    event.waitUntil(
-        caches.open(CACHE_NAME).then(cache => {
-        // 1. Precacheo: Guardamos el App Shell
-            return cache.addAll(appShellAssets);
-        })
-            .then(() => self.skipWaiting()) // Forzamos la activación
-    );
-});
-self.addEventListener('activate', event => {
-    console.log('[SW] 🚀 Service Worker Activado.');
-    // Opcional: Limpieza de cachés antiguas aquí
-    event.waitUntil(self.clients.claim());
+  console.log('[SW] ⚙️ Instalando y precacheando el App Shell...');
+  event.waitUntil(
+    caches.open(cacheName).then(cache => {
+      return cache.addAll(filesOffline);
+    }).then(() => self.skipWaiting())
+  );
 });
 
-// ======================================================
-// C. CICLO DE VIDA: FETCH (ESTRATEGIAS)
-// ======================================================
+// =============================
+// 🚀 ACTIVACIÓN
+// =============================
+self.addEventListener('activate', event => {
+  console.log('[SW] 🚀 Activado.');
+  event.waitUntil(
+    caches.keys().then(keys => 
+      Promise.all(keys.filter(k => k !== cacheName).map(k => caches.delete(k)))
+    ).then(() => self.clients.claim())
+  );
+});
+
+// =============================
+// 🌐 FETCH (ESTRATEGIAS)
+// =============================
 self.addEventListener('fetch', event => {
-    const requestUrl = new URL(event.request.url);
-    // --- ESTRATEGIA 1: CACHE ONLY (para el App Shell) ---
-    const isAppShellRequest = appShellAssets.some(asset =>
-        requestUrl.pathname === asset || requestUrl.pathname === asset.substring(1)
-    );
-    if (isAppShellRequest) {
-        console.log(`[SW] 🔒 App Shell: CACHE ONLY para ${requestUrl.pathname} `);
-        event.respondWith(
-        caches.match(event.request)
-        .then(response => {
-            // Devolvemos la respuesta de caché o un error 500 si falta el archivo
-            return response || new Response('App Shell Asset Missing', { status: 500 });
-        })
-        );
-    return;
-    }
-// --- ESTRATEGIA 2: NETWORK-FIRST con FALLBACK de JSON (para la API)---
-if (requestUrl.host === 'www.thecocktaildb.com' && requestUrl.pathname.includes('/search.php')) {
-    console.log('[SW] 🔄 API: NETWORK-FIRST con Fallback a JSON Genérico.');
+  const requestUrl = new URL(event.request.url);
+
+  // 1️⃣ App Shell (archivos locales)
+  const isAppShellRequest = filesOffline.some(asset =>
+    requestUrl.pathname.endsWith(asset.replace('./', '/'))
+  );
+  if (isAppShellRequest) {
     event.respondWith(
-        fetch(event.request) // Intentamos ir a la red primero
-        .catch(() => {
-            // Si la RED FALLA, devolvemos el JSON de Fallback.
-            console.log('[SW] ❌ Fallo de red. Devolviendo JSON de Fallback.');
-            return new Response(JSON.stringify(OFFLINE_COCKTAIL_JSON), {
-            headers: { 'Content-Type': 'application/json' }
-            });
-        })
+      caches.match(event.request).then(response => {
+        return response || fetch(event.request);
+      })
     );
     return;
-}
-// Para todos los demás recursos (imágenes de la API, otros scripts),
-// se utiliza el comportamiento por defecto (ir a la red).
+  }
+
+  // 2️⃣ API TheCocktailDB (Network-first con fallback JSON)
+  if (requestUrl.host === 'www.thecocktaildb.com' && requestUrl.pathname.includes('/search.php')) {
+    event.respondWith(
+      fetch(event.request).catch(() => {
+        console.warn('[SW] ❌ Sin conexión, usando JSON de fallback.');
+        return new Response(JSON.stringify(OFFLINE_COCKTAIL_JSON), {
+          headers: { 'Content-Type': 'application/json' }
+        });
+      })
+    );
+    return;
+  }
+
+  // 3️⃣ Fallback general (HTML offline)
+  event.respondWith(
+    fetch(event.request).catch(() => {
+      if (event.request.destination === 'document') {
+        return caches.match('./pages/error.html');
+      }
+      return caches.match(event.request);
+    })
+  );
 });
